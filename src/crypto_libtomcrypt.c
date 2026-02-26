@@ -40,7 +40,7 @@ static prng_state prng;
 static volatile unsigned int ltc_init = 0;
 static volatile unsigned int ltc_ref_count = 0;
 
-#define LTC_CIPHER "rijndael"
+#define LTC_CIPHER "aes"
 
 static int sqlcipher_ltc_add_random(void *ctx, const void *buffer, int length) {
   int rc = 0;
@@ -82,7 +82,7 @@ static int sqlcipher_ltc_activate(void *ctx) {
   sqlcipher_memset(random_buffer, 0, FORTUNA_MAX_SZ);
   if(ltc_init == 0) {
     if(register_prng(&fortuna_desc) < 0) return SQLITE_ERROR;
-    if(register_cipher(&rijndael_desc) < 0) return SQLITE_ERROR;
+    if(register_cipher(&aes_desc) < 0) return SQLITE_ERROR;
     if(register_hash(&sha512_desc) < 0) return SQLITE_ERROR;
     if(register_hash(&sha256_desc) < 0) return SQLITE_ERROR;
     if(register_hash(&sha1_desc) < 0) return SQLITE_ERROR;
