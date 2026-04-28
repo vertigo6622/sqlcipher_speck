@@ -1,7 +1,83 @@
-## SQLCipher
+## SQLCipher_SPECK
 
-SQLCipher is a standalone fork of the [SQLite](https://www.sqlite.org/) database library that adds 256 bit AES encryption of database files and other security features like:
+SQLCipher_SPECK is a standalone fork of the SQLCipher library that implements SPECK-256 as the default cipher provider. 
 
+SQLCipher_SPECK uses a 256 bit key and encrypts data in blocks of 128 bits, with a total of 34 independent rounds of encryption. Since this fork uses CTR/counter mode, the encryption includes incrementing counter that is XOR'd with the data depending on its position. This differs from CBC/block mode becuase in CBC mode, there is no counter, and each block is XOR'd with the previous block. CTR mode works better for situations where we want to avoid padding, and especially when the length of the encrypted data is changing frequently.
+
+SPECK was chosen as it is an extremely lightweight yet secure cipher developed by the NSA specifically for resource-constrained environments. SPECK has been observed to be up to 5 times faster than AES with similar margins against cryptanalysis. As you can see below, SPECK is implemented entirely self-contained and does not require the OpenSSL library to work.
+
+---
+**SPECK-256 CTR Implementation:**
+```C
+#define SPECK128_256_ROUNDS 34
+#define SPECK128_BLOCK_SZ   16
+#define SPECK128_KEY_SZ     32
+#define SPECK128_IV_SZ      16
+
+static uint64_t speck_rol64(uint64_t x, int r) {
+    return (x << r) | (x >> (64 - r));
+}
+
+static uint64_t speck_ror64(uint64_t x, int r) {
+    return (x >> r) | (x << (64 - r));
+}
+
+static void speck128_256_key_schedule(const uint64_t key[4], uint64_t rk[SPECK128_256_ROUNDS]) {
+    uint64_t b[3];
+    rk[0] = key[0];
+    b[0] = key[1];
+    b[1] = key[2];
+    b[2] = key[3];
+    for (int i = 0; i < SPECK128_256_ROUNDS - 1; i++) {
+        int idx = i % 3;
+        b[idx] = speck_ror64(b[idx], 8) + rk[i];
+        b[idx] ^= (uint64_t)i;
+        rk[i + 1] = speck_rol64(rk[i], 3) ^ b[idx];
+    }
+}
+
+static void speck128_encrypt_block(uint64_t *x, uint64_t *y, const uint64_t rk[SPECK128_256_ROUNDS]) {
+    for (int i = 0; i < SPECK128_256_ROUNDS; i++) {
+        *x = speck_ror64(*x, 8) + *y;
+        *x ^= rk[i];
+        *y = speck_rol64(*y, 3) ^ *x;
+    }
+}
+
+static void speck128_ctr(const uint64_t rk[SPECK128_256_ROUNDS],
+                         const unsigned char *iv,
+                         const unsigned char *in, int in_sz,
+                         unsigned char *out) {
+    uint64_t counter = 0;
+    unsigned char keystream[SPECK128_BLOCK_SZ];
+
+    for (int i = 0; i < in_sz; i += SPECK128_BLOCK_SZ) {
+        uint64_t b0, b1;
+        memcpy(&b0, iv, 8);
+        memcpy(&b1, iv + 8, 8);
+        b1 ^= counter;
+        counter++;
+
+        speck128_encrypt_block(&b0, &b1, rk);
+
+        memcpy(keystream, &b0, 8);
+        memcpy(keystream + 8, &b1, 8);
+
+        int remaining = in_sz - i;
+        int chunk = remaining < SPECK128_BLOCK_SZ ? remaining : SPECK128_BLOCK_SZ;
+        for (int j = 0; j < chunk; j++) {
+            out[i + j] = in[i + j] ^ keystream[j];
+        }
+    }
+}
+
+
+```
+
+
+---
+
+## SQLCipher Features:
 - on-the-fly encryption
 - tamper detection
 - memory sanitization
