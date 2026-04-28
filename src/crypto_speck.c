@@ -28,11 +28,11 @@
 #define SPECK128_KEY_SZ     32
 #define SPECK128_IV_SZ      16
 
-static uint64_t speck_rol64(uint64_t x, int r) {
+static uint64_t rol64(uint64_t x, int r) {
     return (x << r) | (x >> (64 - r));
 }
 
-static uint64_t speck_ror64(uint64_t x, int r) {
+static uint64_t ror64(uint64_t x, int r) {
     return (x >> r) | (x << (64 - r));
 }
 
@@ -44,17 +44,17 @@ static void speck128_256_key_schedule(const uint64_t key[4], uint64_t rk[SPECK12
     b[2] = key[3];
     for (int i = 0; i < SPECK128_256_ROUNDS - 1; i++) {
         int idx = i % 3;
-        b[idx] = speck_ror64(b[idx], 8) + rk[i];
+        b[idx] = ror64(b[idx], 8) + rk[i];
         b[idx] ^= (uint64_t)i;
-        rk[i + 1] = speck_rol64(rk[i], 3) ^ b[idx];
+        rk[i + 1] = rol64(rk[i], 3) ^ b[idx];
     }
 }
 
 static void speck128_encrypt_block(uint64_t *x, uint64_t *y, const uint64_t rk[SPECK128_256_ROUNDS]) {
     for (int i = 0; i < SPECK128_256_ROUNDS; i++) {
-        *x = speck_ror64(*x, 8) + *y;
+        *x = ror64(*x, 8) + *y;
         *x ^= rk[i];
-        *y = speck_rol64(*y, 3) ^ *x;
+        *y = rol64(*y, 3) ^ *x;
     }
 }
 
