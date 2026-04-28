@@ -73,7 +73,9 @@ static void speck128_ctr(const uint64_t rk[SPECK128_256_ROUNDS],
 
 
 ```
-
+**Compiling SQLCipher_SPECK:** 
+1. **Configure:** `./configure --with-tempstore=yes CFLAGS="-DSQLITE_HAS_CODEC -DSQLCIPHER_CRYPTO_CUSTOM=speck_register_provider -DSQLITE_EXTRA_INIT=sqlcipher_extra_init -DSQLITE_EXTRA_SHUTDOWN=sqlcipher_extra_shutdown -DSQLITE_THREADSAFE=1 -DSQLITE_TEMP_STORE=2" AMALGAMATION_EXTRA_SRC="src/crypto_speck.c" 2>&1`
+2. **Compile:** `make EXTRA_SRC=src/crypto_speck.c`
 
 ---
 
