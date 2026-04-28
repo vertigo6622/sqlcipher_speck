@@ -1,12 +1,14 @@
 /*
-** SQLCipher SPECK 128/256 CTR Provider
-** Self-contained crypto provider using SPECK 128/256 in CTR mode
-** with SHA-256 based HMAC and PBKDF2.
-**
-** Compile with:
-**   -DSQLCIPHER_CRYPTO_CUSTOM=speck_register_provider
+*  SQLCIPHER_SPECK
+*
+*  Author: vertigo (github.com/vertigo6622)
+*  License: BSD-3-Clause license 
+*
+*  * SQLCipher SPECK 128/256 CTR Provider
+*  * Self-contained crypto provider using SPECK 128/256 in CTR mode 
+*  * SHA-256 based HMAC and PBKDF2
+*
 */
-/* BEGIN SQLCIPHER */
 #ifdef SQLITE_HAS_CODEC
 #ifdef SQLCIPHER_CRYPTO_CUSTOM
 
