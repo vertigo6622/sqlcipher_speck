@@ -476,4 +476,3 @@ int speck_register_provider(sqlcipher_provider *p) {
 
 #endif
 #endif
-/* END SQLCIPHER */
