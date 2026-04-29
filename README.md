@@ -78,7 +78,7 @@ static void speck128_ctr(const uint64_t rk[SPECK128_256_ROUNDS],
 1. Full compiled SPECK-enabled sqlite3 binary is just 2MB
 2. Encryption is blazing-fast without hardware acceleration
 3. Zero supply chain risk from the OpenSSL library
-4. Code is easily auditable at ~480 loc
+4. Cipher code is easily auditable at ~480 loc
 
 **Use Cases:**
 1. Low-resource computing (raspberry pi, esp32, etc)
