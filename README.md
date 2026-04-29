@@ -73,6 +73,20 @@ static void speck128_ctr(const uint64_t rk[SPECK128_256_ROUNDS],
 
 
 ```
+
+**Benefits:**
+1. Full compiled SPECK-enabled sqlite3 binary is just 2MB
+2. Encryption is blazing-fast without hardware acceleration
+3. Zero supply chain risk from the OpenSSL library
+4. Code is easily auditable at ~480 loc
+
+**Use Cases:**
+1. Low-resource computing (raspberry pi, esp32, etc)
+2. Zero-dependency environments (mitigating supply chain risk)
+3. Embedded/IoT devices that need encrypted local storage
+4. Mobile apps avoiding large crypto library imports
+5. Real-time systems where deterministic, constant-time execution matters (SPECK is immune to cache timing attacks)
+
 **Compiling SQLCipher_SPECK:** 
 1. **Configure:** `./configure --with-tempstore=yes CFLAGS="-DSQLITE_HAS_CODEC -DSQLCIPHER_CRYPTO_CUSTOM=speck_register_provider -DSQLITE_EXTRA_INIT=sqlcipher_extra_init -DSQLITE_EXTRA_SHUTDOWN=sqlcipher_extra_shutdown -DSQLITE_THREADSAFE=1 -DSQLITE_TEMP_STORE=2" AMALGAMATION_EXTRA_SRC="src/crypto_speck.c" 2>&1`
 2. **Compile:** `make EXTRA_SRC=src/crypto_speck.c`
