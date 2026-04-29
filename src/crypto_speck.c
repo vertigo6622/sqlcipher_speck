@@ -2,7 +2,7 @@
 *  SQLCIPHER_SPECK
 *
 *  Author: vertigo (github.com/vertigo6622)
-*  License: BSD-3-Clause license 
+*  License: Anti-Capitalist Software License (1.4 modified)
 *
 *  * SQLCipher SPECK 128/256 CTR Provider
 *  * Self-contained crypto provider using SPECK 128/256 in CTR mode 
