@@ -44,7 +44,7 @@ static void speck128_256_key_schedule(const uint64_t key[4], uint64_t rk[SPECK12
         int idx = i % 3;
         b[idx] = ror64(b[idx], 8) + rk[i];
         b[idx] ^= (uint64_t)i;
-        rk[i + 1] = rol64(rk[i], 3) ^ b[idx];
+        rk[i+1] = rol64(rk[i], 3) ^ b[idx];
     }
 }
 
