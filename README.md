@@ -25,9 +25,7 @@ static uint64_t ror64(uint64_t x, int r) {
 static void speck128_256_key_schedule(const uint64_t key[4], uint64_t rk[SPECK128_256_ROUNDS]) {
     uint64_t b[3];
     rk[0] = key[0];
-    b[0] = key[1];
-    b[1] = key[2];
-    b[2] = key[3];
+    for (int i = 0; i < 3; i++) b[i] = key[i+1];
     for (int i = 0; i < SPECK128_256_ROUNDS - 1; i++) {
         int idx = i % 3;
         b[idx] = ror64(b[idx], 8) + rk[i];
